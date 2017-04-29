@@ -174,12 +174,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Coordinations.cs" />
-    <Compile Include="Elements.cs" />
-    <Compile Include="Selections.cs" />
-    <Compile Include="DynaToolsFunctions.cs" />
-    <Compile Include="Collectors.cs" />
-    <Compile Include="SQL.cs" />
+    <Compile Include="Libraries\Coordinations.cs" />
+    <Compile Include="Libraries\Elements.cs" />
+    <Compile Include="Libraries\Selections.cs" />
+    <Compile Include="Functions\DynaToolsFunctions.cs" />
+    <Compile Include="Libraries\Collectors.cs" />
+    <Compile Include="Libraries\SQL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -188,7 +188,6 @@
   <ItemGroup>
     <Content Include="Resources\SQLTools.Connect.Server.Large.png" />
     <Content Include="Resources\SQLTools.Connect.Server.Small.png" />
-    <Content Include="TextFile1.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\DynaTools.resx" />
