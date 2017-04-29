@@ -1,10 +1,12 @@
 ﻿using Autodesk.DesignScript.Runtime;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using DynaToolsFunctions;
 using Revit.Elements;
 using RevitServices.Persistence;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CollectorTools
 {
@@ -303,60 +305,7 @@ namespace CollectorTools
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public static class Documents
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        [MultiReturn(new[] { "activeDocument"})]
-        public static Dictionary<string, object> activeDocument()
-        {
-            Document doc = DocumentManager.Instance.CurrentDBDocument;
-            
-            return new Dictionary<string, object>
-            {
-                { "activeDocument", doc},
-            };
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        [MultiReturn(new[] { "documents", "documentNames", "documentPaths"})]
-        public static Dictionary<string, object> linkedDocuments(bool refresh = false)
-        {
-            List<Document> docList = new List<Document>();
-            List<string> docNames = new List<string>();
-            List<string> docPaths = new List<string>();
-
-            if (refresh)
-            {
-                Document doc = DocumentManager.Instance.CurrentDBDocument;
-                FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(RevitLinkInstance));
-
-                
-                foreach (RevitLinkInstance l in collector)
-                {
-                    docList.Add(l.GetLinkDocument());
-                    docNames.Add(l.Name);
-                    docPaths.Add(l.GetLinkDocument().PathName);
-                }
-            }
-  
-            return new Dictionary<string,object>
-            {
-                { "documents", docList},
-                {"documentNames", docNames},
-                {"documentPaths", docPaths},
-            };
-        }
-
-    }
+   
 
    
 
