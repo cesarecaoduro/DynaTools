@@ -1,0 +1,27 @@
+﻿copy "$(TargetFileName)" "C:\Users\CESARE\AppData\Roaming\Dynamo\Dynamo Revit\1.3\packages\DynaTools\bin"
+copy "$(TargetName).xml" "C:\Users\CESARE\AppData\Roaming\Dynamo\Dynamo Revit\1.3\packages\DynaTools\bin"
+
+
+#region MyRegion
+                Autodesk.Revit.DB.Element eType = doc.GetElement(el.GetTypeId());
+                ParameterSet pSetType = eType.Parameters;
+                foreach (Autodesk.Revit.DB.Parameter p in pSetType)
+                {
+
+                    if (eType.get_Parameter(p.Definition.Name) != null)
+                    {
+                        switch (p.StorageType)
+                        {
+                            case StorageType.Double: itemParams.Add(eType.get_Parameter(p.Definition.Name).AsValueString()); break;
+                            case StorageType.Integer: itemParams.Add(eType.get_Parameter(p.Definition.Name).AsInteger()); break;
+                            case StorageType.String: itemParams.Add(eType.get_Parameter(p.Definition.Name).AsString()); break;
+                            case StorageType.ElementId: itemParams.Add(eType.get_Parameter(p.Definition.Name).AsValueString()); break;
+                        }
+                    }
+                    else
+                    {
+                        itemParams.Add("");
+                    }
+
+                } 
+                #endregion
