@@ -21,7 +21,7 @@ namespace RebarTools
         /// </summary>
         /// <param name="elements">List of rebars elements</param>
         /// <returns></returns>
-        [MultiReturn(new[] { "Elements"})]
+        [MultiReturn(new[] { "hostElements" })]
         public static Dictionary<string, object> getHostElement(List<Revit.Elements.Element> elements)
         {
           
@@ -51,12 +51,11 @@ namespace RebarTools
         /// </summary>
         /// <param name="elements">List of elements that can host rebars</param>
         /// <returns></returns>
-        [MultiReturn(new[] { "Covers"})]
+        [MultiReturn(new[] { "topExterior", "bottomInterior", "others"})]
         public static Dictionary<string, object> getRebarCover(List<Revit.Elements.Element> elements)
         {
             string message = "";
             Document doc = DocumentManager.Instance.CurrentDBDocument;
-            List<Revit.Elements.Element> elIdList = new List<Revit.Elements.Element>();
             DynaFunctions f = new DynaFunctions();
             //UIApplication uiapp = DocumentManager.Instance.CurrentUIApplication;
             //Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
@@ -74,38 +73,171 @@ namespace RebarTools
                 BuiltInParameter.CLEAR_COVER_OTHER,
                 BuiltInParameter.CLEAR_COVER
             };
-            List<List<double>> coverValues = new List<List<double>>();
-
             foreach (Revit.Elements.Element e in elements)
             {
-                try
-                {
-                    el = doc.GetElement(e.UniqueId.ToString());
-                    List<double> coverValue = new List<double>();
-                    foreach (BuiltInParameter c in covers)
+                el = doc.GetElement(e.UniqueId.ToString());
+                List<double> coverValue = new List<double>();
+                foreach (BuiltInParameter c in covers)
+                { 
+                    try
                     {
                         ElementId rctId = el.get_Parameter(c).AsElementId();
                         RebarCoverType rct = doc.GetElement(rctId) as RebarCoverType;
                         double cv = f.feetToMillimeter(rct.get_Parameter(BuiltInParameter.COVER_TYPE_LENGTH).AsDouble());
-                        if (cv >= 0)
-                        {
-                            coverValue.Add(cv);
-                        }
+                        coverValue.Add(cv);
                     }
-                    coverValues.Add(coverValue);
+                    catch (Exception ex)
+                    {
+                        message = ex.Message;
+                    }
+                     
                 }
-                catch (Exception ex)
-                {
-                    message = ex.Message;
-                }
-
-                
+                topExterior.Add(coverValue[0]);
+                bottomInterior.Add(coverValue[1]);
+                others.Add(coverValue[2]); 
             }
 
             return new Dictionary<string, object>
             { 
-                { "Covers", coverValues},
-                { "Message", message },
+                { "topExterior", topExterior},
+                { "bottomInterior", bottomInterior},
+                { "others", others},
+                //{ "Message", message },
+            };
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rebars"></param>
+        /// <returns></returns>
+        [MultiReturn(new[] { "rebarStyle", "rebarBarType", "hookStartType", "hookEndType", "hookStartOrientation", "hookEndOrientation"})]
+        public static Dictionary<string, object> getRebarProperties(List<Revit.Elements.Element> rebars)
+        {
+            string message = "";
+            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            DynaFunctions f = new DynaFunctions();
+            //UIApplication uiapp = DocumentManager.Instance.CurrentUIApplication;
+            //Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
+            //UIDocument uidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument;
+            List<string> rStyle = new List<string>();
+            List<Revit.Elements.Element> rType = new List<Revit.Elements.Element>();
+            List<Revit.Elements.Element> hStartType = new List<Revit.Elements.Element>();
+            List<Revit.Elements.Element> hEndType = new List<Revit.Elements.Element>();
+            List<string> hStartOrient = new List<string>();
+            List<string> hEndOrient = new List<string>();
+
+            foreach (Revit.Elements.Element r in rebars)
+            {
+                Autodesk.Revit.DB.Element el = doc.GetElement(r.UniqueId.ToString());
+                rStyle.Add(el.get_Parameter(BuiltInParameter.REBAR_ELEM_HOOK_STYLE).AsValueString());
+                ElementId eId = el.get_Parameter(BuiltInParameter.ELEM_TYPE_PARAM).AsElementId();
+                rType.Add(doc.GetElement(eId).ToDSType(true));
+                try
+                {
+                    eId = el.get_Parameter(BuiltInParameter.REBAR_ELEM_HOOK_START_TYPE).AsElementId();
+                    hStartType.Add(doc.GetElement(eId).ToDSType(true));
+                    
+                }
+                catch { hStartType.Add(null); }
+                try
+                {
+                    eId = el.get_Parameter(BuiltInParameter.REBAR_ELEM_HOOK_END_TYPE).AsElementId();
+                    hEndType.Add(doc.GetElement(eId).ToDSType(true));
+                }
+                catch{ hEndType.Add(null);  }
+                hEndOrient.Add(el.get_Parameter(BuiltInParameter.REBAR_ELEM_HOOK_END_ORIENT).AsValueString());
+                hStartOrient.Add(el.get_Parameter(BuiltInParameter.REBAR_ELEM_HOOK_START_ORIENT).AsValueString());
+            }
+
+            return new Dictionary<string, object>
+            {
+                { "rebarStyle", rStyle},
+                { "rebarBarType", rType},
+                { "hookStartType", hStartType},
+                { "hookEndType", hEndType},
+                { "hookStartOrientation", hStartOrient},
+                { "hookEndOrientation", hEndOrient},
+                //{ "Message", message },
+            };
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rebarBarType"></param>
+        /// <returns></returns>
+        [MultiReturn(new[] { "rebarDiameter"})]
+        public static Dictionary<string, object> getRebarDiameter(List<Revit.Elements.Element> rebarBarType)
+        {
+            string message = "";
+            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            DynaFunctions f = new DynaFunctions();
+            //UIApplication uiapp = DocumentManager.Instance.CurrentUIApplication;
+            //Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
+            //UIDocument uidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument;
+            List<double> rDiameters = new List<double>();
+            
+            foreach (Revit.Elements.Element rt in rebarBarType)
+            {
+                Autodesk.Revit.DB.Element el = doc.GetElement(rt.UniqueId.ToString());
+                rDiameters.Add(f.feetToMillimeter(el.get_Parameter(BuiltInParameter.REBAR_BAR_DIAMETER).AsDouble()));
+            }
+
+            return new Dictionary<string, object>
+            {
+                { "rebarDiameter", rDiameters},
+                //{ "Message", message },
+            };
+
+        }
+
+        [MultiReturn(new[] { "polyCurves" })]
+        public static Dictionary<string, object> getRebarCenterLineCurve(
+            List<Revit.Elements.Element> rebar,
+            bool adjustForSelfIntersection = false,
+            bool suppressHooks = true,
+            bool suppressBendRadius = true,
+            bool multiplanarOption = true
+            )
+        {
+            string message = "";
+            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            DynaFunctions f = new DynaFunctions();
+            //UIApplication uiapp = DocumentManager.Instance.CurrentUIApplication;
+            //Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
+            //UIDocument uidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument;
+            List<Autodesk.DesignScript.Geometry.PolyCurve> curves = new List<Autodesk.DesignScript.Geometry.PolyCurve>();
+            MultiplanarOption mp = MultiplanarOption.IncludeOnlyPlanarCurves;
+            
+            foreach (Revit.Elements.Element r in rebar)
+            {
+                switch (multiplanarOption)
+                {
+                    case true: mp = MultiplanarOption.IncludeOnlyPlanarCurves; break;
+                    case false: mp = MultiplanarOption.IncludeAllMultiplanarCurves; break;
+
+                }
+                Autodesk.Revit.DB.Element el = doc.GetElement(r.UniqueId.ToString());
+                Rebar reb = el as Rebar;
+                IList<Curve> sketch = reb.GetCenterlineCurves(adjustForSelfIntersection, suppressHooks, suppressBendRadius, mp, 0);
+                List<Autodesk.DesignScript.Geometry.Curve> crv = new List<Autodesk.DesignScript.Geometry.Curve>();
+                foreach (Curve s in sketch)
+                {
+                    Autodesk.DesignScript.Geometry.Curve c = Revit.GeometryConversion.RevitToProtoCurve.ToProtoType(s, true);
+                    crv.Add(c);
+                }
+                Autodesk.DesignScript.Geometry.PolyCurve pc = Autodesk.DesignScript.Geometry.PolyCurve.ByJoinedCurves(crv);
+                curves.Add(pc);
+
+            }
+
+            return new Dictionary<string, object>
+            {
+                { "polyCurves", curves},
+                //{ "Message", message },
             };
 
         }
