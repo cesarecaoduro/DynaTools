@@ -24,7 +24,7 @@ namespace RebarTools
         [MultiReturn(new[] { "hostElements" })]
         public static Dictionary<string, object> getHostElement(List<Revit.Elements.Element> elements)
         {
-
+          
             Document doc = DocumentManager.Instance.CurrentDBDocument;
             List<Revit.Elements.Element> elIdList = new List<Revit.Elements.Element>();
             //UIApplication uiapp = DocumentManager.Instance.CurrentUIApplication;
@@ -51,7 +51,7 @@ namespace RebarTools
         /// </summary>
         /// <param name="elements">List of elements that can host rebars</param>
         /// <returns></returns>
-        [MultiReturn(new[] { "topExterior", "bottomInterior", "others" })]
+        [MultiReturn(new[] { "topExterior", "bottomInterior", "others"})]
         public static Dictionary<string, object> getRebarCover(List<Revit.Elements.Element> elements)
         {
             string message = "";
@@ -78,7 +78,7 @@ namespace RebarTools
                 el = doc.GetElement(e.UniqueId.ToString());
                 List<double> coverValue = new List<double>();
                 foreach (BuiltInParameter c in covers)
-                {
+                { 
                     try
                     {
                         ElementId rctId = el.get_Parameter(c).AsElementId();
@@ -90,15 +90,15 @@ namespace RebarTools
                     {
                         message = ex.Message;
                     }
-
+                     
                 }
                 topExterior.Add(coverValue[0]);
                 bottomInterior.Add(coverValue[1]);
-                others.Add(coverValue[2]);
+                others.Add(coverValue[2]); 
             }
 
             return new Dictionary<string, object>
-            {
+            { 
                 { "topExterior", topExterior},
                 { "bottomInterior", bottomInterior},
                 { "others", others},
@@ -112,7 +112,7 @@ namespace RebarTools
         /// </summary>
         /// <param name="rebars"></param>
         /// <returns></returns>
-        [MultiReturn(new[] { "rebarStyle", "rebarBarType", "hookStartType", "hookEndType", "hookStartOrientation", "hookEndOrientation" })]
+        [MultiReturn(new[] { "rebarStyle", "rebarBarType", "hookStartType", "hookEndType", "hookStartOrientation", "hookEndOrientation"})]
         public static Dictionary<string, object> getRebarProperties(List<Revit.Elements.Element> rebars)
         {
             string message = "";
@@ -138,7 +138,7 @@ namespace RebarTools
                 {
                     eId = el.get_Parameter(BuiltInParameter.REBAR_ELEM_HOOK_START_TYPE).AsElementId();
                     hStartType.Add(doc.GetElement(eId).ToDSType(true));
-
+                    
                 }
                 catch { hStartType.Add(null); }
                 try
@@ -146,7 +146,7 @@ namespace RebarTools
                     eId = el.get_Parameter(BuiltInParameter.REBAR_ELEM_HOOK_END_TYPE).AsElementId();
                     hEndType.Add(doc.GetElement(eId).ToDSType(true));
                 }
-                catch { hEndType.Add(null); }
+                catch{ hEndType.Add(null);  }
                 hEndOrient.Add(el.get_Parameter(BuiltInParameter.REBAR_ELEM_HOOK_END_ORIENT).AsValueString());
                 hStartOrient.Add(el.get_Parameter(BuiltInParameter.REBAR_ELEM_HOOK_START_ORIENT).AsValueString());
             }
@@ -169,7 +169,7 @@ namespace RebarTools
         /// </summary>
         /// <param name="rebarBarType"></param>
         /// <returns></returns>
-        [MultiReturn(new[] { "rebarDiameter" })]
+        [MultiReturn(new[] { "rebarDiameter"})]
         public static Dictionary<string, object> getRebarDiameter(List<Revit.Elements.Element> rebarBarType)
         {
             string message = "";
@@ -179,7 +179,7 @@ namespace RebarTools
             //Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
             //UIDocument uidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument;
             List<double> rDiameters = new List<double>();
-
+            
             foreach (Revit.Elements.Element rt in rebarBarType)
             {
                 Autodesk.Revit.DB.Element el = doc.GetElement(rt.UniqueId.ToString());
@@ -211,7 +211,7 @@ namespace RebarTools
             //UIDocument uidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument;
             List<Autodesk.DesignScript.Geometry.PolyCurve> curves = new List<Autodesk.DesignScript.Geometry.PolyCurve>();
             MultiplanarOption mp = MultiplanarOption.IncludeOnlyPlanarCurves;
-
+            
             foreach (Revit.Elements.Element r in rebar)
             {
                 switch (multiplanarOption)
@@ -242,62 +242,10 @@ namespace RebarTools
 
         }
 
-
-
     }
 
-    public static class Layout
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="rebars">List of rebars element</param>
-        /// <param name="distributionType">true = Varying Lenght /n false = Uniform</param>
-        /// <returns></returns>
-        [MultiReturn(new[] { "rebars" })]
-        public static Dictionary<string, object> setRebarDistributionType(List<Revit.Elements.Element> rebars, bool distributionType = false)
-        {
-            string message = "";
-            Document doc = DocumentManager.Instance.CurrentDBDocument;
-            DynaFunctions f = new DynaFunctions();
-            //UIApplication uiapp = DocumentManager.Instance.CurrentUIApplication;
-            //Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
-            //UIDocument uidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument;
-            List<double> rDiameters = new List<double>();
-
-            Transaction tx = new Transaction(doc, "rebars");
-
-            DistributionType dt = DistributionType.Uniform;
-            switch (distributionType)
-            {
-                case true: dt = DistributionType.VaryingLength; break;
-                case false: dt = DistributionType.Uniform; break;
-            }
-            foreach (Revit.Elements.Element r in rebars)
-            {
-                Autodesk.Revit.DB.Element el = doc.GetElement(r.UniqueId.ToString());
-                Rebar reb = el as Rebar;
-                try
-                {
-                    tx.Start("rebars");
-                    reb.DistributionType = dt;
-                    tx.Commit();
-                }
-                catch (Exception ex)
-                {
-                    message = ex.Message;
-                }
-
-            }
-
-            return new Dictionary<string, object>
-            {
-                { "rebarDiameter", rDiameters},
-                { "Message", message },
-            };
-        }
 
 
-    }
+
 
 }
