@@ -50,7 +50,6 @@ namespace DocumentTools
                 Document doc = DocumentManager.Instance.CurrentDBDocument;
                 FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(RevitLinkInstance));
 
-
                 foreach (RevitLinkInstance l in collector)
                 {
                     docList.Add(l.GetLinkDocument());
