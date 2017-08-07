@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 using Autodesk.DesignScript.Runtime;
 using Dynamo.Graph.Nodes;
@@ -25,6 +26,7 @@ using System.Windows.Controls.Primitives;
 using Dynamo.Configuration;
 using System.Windows;
 using DynaToolsFunctions;
+using Autodesk.Revit.DB.Plumbing;
 
 namespace ElementTools
 {
@@ -310,50 +312,21 @@ namespace ElementTools
                 { "notFound", notFound}
             };
         }
-
-        //[MultiReturn(new[] { "filled", "empty" })]
-        //public static Dictionary<string, object> CheckIfParameterIsEmpty(List<Revit.Elements.Element> elements, List<String> parameters)
-        //{
-        //    Document doc = DocumentManager.Instance.CurrentDBDocument;
-        //    List<List<Revit.Elements.Element>> filled = new List<List<Revit.Elements.Element>>();
-        //    List<List<Revit.Elements.Element>> empty = new List<List<Revit.Elements.Element>>();
-
-            
-
-        //    foreach (string s in parameters)
-        //    {
-        //        List<Revit.Elements.Element> fi = new List<Revit.Elements.Element>();
-        //        List<Revit.Elements.Element> em = new List<Revit.Elements.Element>();
-        //        foreach (Revit.Elements.Element e in elements)
-        //        {
-        //            if (e.GetParameterValueByName(s) != null)
-        //            {
-        //                fi.Add(e);
-        //            }
-        //            else
-        //            {
-        //                em.Add(e);
-        //            }
-        //        }
-        //        empty.Add(em);
-        //        filled.Add(fi);
-        //    }
-
-        //    return new Dictionary<string, object>
-        //    {
-        //        { "filled", filled},
-        //        { "empty", empty}
-        //    };
-        //}
-
-    };
+        
+    }
 
     /// <summary>
     /// 
     /// </summary>
     public static class Tools
     {
-        [MultiReturn(new[] { "elements"})]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="elements"></param>
+        /// <param name="endLevel"></param>
+        /// <returns></returns>
+        [MultiReturn(new[] { "elements" })]
         public static Dictionary<string, object> ChangeFittingsLevel(List<Revit.Elements.Element> elements, Revit.Elements.Level endLevel)
         {
             Document doc = DocumentManager.Instance.CurrentDBDocument;
@@ -361,7 +334,7 @@ namespace ElementTools
             Autodesk.Revit.DB.Element ll = doc.GetElement(endLevel.UniqueId.ToString());
             double ofEndLevel = ll.get_Parameter(BuiltInParameter.LEVEL_ELEV).AsDouble();
             ElementId endLeveliD = ll.Id;
-            
+
             try
             {
                 foreach (Revit.Elements.Element e in elements)
@@ -381,7 +354,7 @@ namespace ElementTools
             {
                 result = "Not executed: " + ex.Message;
             }
-  
+
             return new Dictionary<string, object>
             {
                 {"elements", elements},
@@ -389,9 +362,81 @@ namespace ElementTools
             };
         }
 
-       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="elements">List of Ducts</param>
+        /// <param name="ductInsulationType">Select the insulation type</param>
+        /// <param name="insulationThickness">In millimiters</param>
+        /// <returns></returns>
+        [MultiReturn(new[] { "elements" })]
+        public static Dictionary<string, object> CreateDuctInsulation(List<Revit.Elements.Element> elements, Revit.Elements.Element ductInsulationType, double insulationThickness)
+        {
+            string result = "";
+            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            ElementId dITId = doc.GetElement(ductInsulationType.UniqueId.ToString()).Id;
+            insulationThickness *= 0.00328084;
 
-    };
+            try
+            {
+                foreach (Revit.Elements.Element e in elements)
+                {
+                    ElementId elId = doc.GetElement(e.UniqueId.ToString()).Id;
+                    DuctInsulation.Create(doc, elId, dITId, insulationThickness);
+                }
+                result = "Executed";
 
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+
+            return new Dictionary<string, object>
+            {
+                {"elements", elements},
+                { "result", result}
+            };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="elements">List of Pipes</param>
+        /// <param name="pipeInsulationType">Select the insulation type</param>
+        /// <param name="insulationThickness">In millimiters</param>
+        /// <returns></returns>
+        [NodeName("Create pipe insulation")]
+        [NodeDescription("CreatePipeInsulation")]
+        [MultiReturn(new[] { "elements" })]
+        public static Dictionary<string, object> CreatePipeInsulation(List<Revit.Elements.Element> elements, Revit.Elements.Element pipeInsulationType, double insulationThickness)
+        {
+            string result = "";
+            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            ElementId dITId = doc.GetElement(pipeInsulationType.UniqueId.ToString()).Id;
+            insulationThickness *= 0.00328084;
+
+            try
+            {
+                foreach (Revit.Elements.Element e in elements)
+                {
+                    ElementId elId = doc.GetElement(e.UniqueId.ToString()).Id;
+                    PipeInsulation.Create(doc, elId, dITId, insulationThickness);
+                }
+                result = "Executed";
+
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+
+            return new Dictionary<string, object>
+            {
+                {"elements", elements},
+                { "result", result}
+            };
+        }
+    }
 
 }
