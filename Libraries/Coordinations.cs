@@ -18,8 +18,7 @@ namespace CoordinationTools
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="doc">Document</param>
-        /// <param name="category">Category</param>
+        /// <param name="category"></param>
         /// <param name="refresh"></param>
         /// <returns></returns>
         [IsDesignScriptCompatible]

@@ -51,7 +51,6 @@ namespace ViewTools
                 cP.Add(ADG.Point.ByCoordinates(maxPoint.X, maxPoint.Y));
                 cP.Add(ADG.Point.ByCoordinates(maxPoint.X, minPoint.Y));
 
-
                 mmP.Add(ADG.Point.ByCoordinates(minPoint.X, minPoint.Y));
                 mmP.Add(ADG.Point.ByCoordinates(maxPoint.X, maxPoint.Y));
 

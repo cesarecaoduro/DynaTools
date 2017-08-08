@@ -48,7 +48,6 @@ namespace SelectionTools
             if (refresh)
             {
 
-                
                 try
                 {
                     Document doc = DocumentManager.Instance.CurrentDBDocument;

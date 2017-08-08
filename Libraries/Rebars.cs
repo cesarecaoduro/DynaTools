@@ -1,13 +1,11 @@
 ﻿using Autodesk.DesignScript.Runtime;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
-using Autodesk.Revit.UI;
 using DynaToolsFunctions;
 using Revit.Elements;
 using RevitServices.Persistence;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace RebarTools
 {

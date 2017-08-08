@@ -1,12 +1,6 @@
 ﻿using Autodesk.DesignScript.Runtime;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using CoreNodeModels;
-using Dynamo.Graph.Nodes;
-using Dynamo.Utilities;
-using DynaToolsFunctions;
-using ProtoCore.AST.AssociativeAST;
-using Revit.Elements;
 using RevitServices.Persistence;
 using System;
 using System.Collections.Generic;
