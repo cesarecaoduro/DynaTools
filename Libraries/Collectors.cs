@@ -22,6 +22,7 @@ namespace CollectorTools
         /// </summary>
         /// <param name="refresh">Refresh the output</param>
         /// <returns></returns>
+        [NodeName("Cable Tray Collector")]
         [MultiReturn(new[] { "Elements", "Id", "Name", "Length", "Offset", "Size", "Level" })]
         public static Dictionary<string, object> CableTrayCollector(Boolean refresh = false)
         {
@@ -186,9 +187,5 @@ namespace CollectorTools
 
        
     }
-
-   
-
-   
 
 }

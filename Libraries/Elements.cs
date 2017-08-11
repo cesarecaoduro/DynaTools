@@ -8,6 +8,9 @@ using RevitServices.Persistence;
 using Revit.Elements;
 using DynaToolsFunctions;
 using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.DB.Mechanical;
+
+using DSRevitNodesUI;
 
 namespace ElementTools
 {
@@ -255,8 +258,12 @@ namespace ElementTools
             };
 
         }
+
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class Parameters
     {
         [MultiReturn(new[] { "found", "notFound"})]
@@ -415,6 +422,80 @@ namespace ElementTools
             return new Dictionary<string, object>
             {
                 {"elements", elements},
+                { "result", result}
+            };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="points"></param>
+        /// <returns></returns>
+        [MultiReturn(new[] { "elements" })]
+        public static Dictionary<string, object> SplitPipeByPoints(Revit.Elements.Element element, List<Autodesk.DesignScript.Geometry.Point> points)
+        {
+            string result = "";
+            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            List<Revit.Elements.Element> splitPipes = new List<Revit.Elements.Element>();
+            ElementId eId = doc.GetElement(element.UniqueId.ToString()).Id;
+            Units units = doc.GetUnits();
+            FormatOptions fo =  units.GetFormatOptions(UnitType.UT_Length);
+
+            try
+            {
+                foreach (Autodesk.DesignScript.Geometry.Point p in points)
+                {
+                    double pX = UnitUtils.ConvertToInternalUnits(p.X, fo.DisplayUnits);
+                    double pY = UnitUtils.ConvertToInternalUnits(p.Y, fo.DisplayUnits);
+                    double pZ = UnitUtils.ConvertToInternalUnits(p.Z, fo.DisplayUnits);
+                    XYZ ptBreak = new XYZ(pX, pY, pZ);
+                    ElementId pieceOfPipe = PlumbingUtils.BreakCurve(doc, eId, ptBreak);
+                    splitPipes.Add(doc.GetElement(pieceOfPipe).ToDSType(true));
+                }   
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+
+            return new Dictionary<string, object>
+            {
+                {"elements", splitPipes},
+                { "result", result}
+            };
+        }
+
+        [MultiReturn(new[] { "elements" })]
+        public static Dictionary<string, object> SplitDuctByPoints(Revit.Elements.Element element, List<Autodesk.DesignScript.Geometry.Point> points)
+        {
+            string result = "";
+            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            List<Revit.Elements.Element> splitDucts = new List<Revit.Elements.Element>();
+            ElementId eId = doc.GetElement(element.UniqueId.ToString()).Id;
+            Units units = doc.GetUnits();
+            FormatOptions fo = units.GetFormatOptions(UnitType.UT_Length);
+
+            try
+            {
+                foreach (Autodesk.DesignScript.Geometry.Point p in points)
+                {
+                    double pX = UnitUtils.ConvertToInternalUnits(p.X, fo.DisplayUnits);
+                    double pY = UnitUtils.ConvertToInternalUnits(p.Y, fo.DisplayUnits);
+                    double pZ = UnitUtils.ConvertToInternalUnits(p.Z, fo.DisplayUnits);
+                    XYZ ptBreak = new XYZ(pX, pY, pZ);
+                    ElementId pieceOfPipe = MechanicalUtils.BreakCurve(doc, eId, ptBreak);
+                    splitDucts.Add(doc.GetElement(pieceOfPipe).ToDSType(true));
+                }
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+
+            return new Dictionary<string, object>
+            {
+                {"elements", splitDucts},
                 { "result", result}
             };
         }

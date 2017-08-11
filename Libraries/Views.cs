@@ -71,4 +71,52 @@ namespace ViewTools
             };
         }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class Sheets
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="viewNames"></param>
+        /// <param name="viewNumbers"></param>
+        /// <param name="titleBlock"></param>
+        /// <returns></returns>
+        [MultiReturn(new[] { "Sheets" })]
+        public static Dictionary<string, object> CreateSheets(List<string> sheetNames, List<string> sheetNumbers, Revit.Elements.Element titleBlock)
+        {
+            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            string message = "";
+            List<Revit.Elements.Element> sheetsList = new List<Revit.Elements.Element>();
+            ElementId titleBlockId = doc.GetElement(titleBlock.UniqueId.ToString()).Id;
+
+            try
+            {
+                int k = 0;
+                foreach (string vN in sheetNames)
+                {
+                    ViewSheet s = ViewSheet.Create(doc, titleBlockId);
+                    s.Name = vN;
+                    s.SheetNumber = sheetNumbers[k];
+                    k++;
+                    sheetsList.Add(s.ToDSType(true));
+                }
+
+                message = "Executed";
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
+
+            return new Dictionary<string, object>
+            {
+                {"Sheets", sheetsList},
+                {"message", message},
+            };
+
+        }
+    }
 }
