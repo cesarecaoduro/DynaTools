@@ -1,0 +1,69 @@
+﻿using CoreNodeModels;
+using Dynamo.Graph.Nodes;
+using ProtoCore.AST.AssociativeAST;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DropDown
+{
+    [NodeName("Drop Down Example")]
+    [NodeDescription("An example drop down node.")]
+    [IsDesignScriptCompatible]
+    public class DropDownExample : DSDropDownBase
+    {
+        public DropDownExample() : base("item")
+        {
+            new List<DynamoDropDownItem>()
+            {
+                new DynamoDropDownItem("Tywin", 0),
+                new DynamoDropDownItem("Cersei", 1),
+                new DynamoDropDownItem("Hodor",2)
+            };
+        }
+
+        protected override SelectionState PopulateItemsCore(string currentSelection)
+        {
+            // The Items collection contains the elements
+            // that appear in the list. For this example, we
+            // clear the list before adding new items, but you
+            // can also use the PopulateItems method to add items
+            // to the list.
+
+            Items.Clear();
+
+            // Create a number of DynamoDropDownItem objects 
+            // to store the items that we want to appear in our list.
+
+            var newItems = new List<DynamoDropDownItem>()
+            {
+                new DynamoDropDownItem("Tywin", 0),
+                new DynamoDropDownItem("Cersei", 1),
+                new DynamoDropDownItem("Hodor",2)
+            };
+
+            foreach (var e in newItems)
+            {
+                Items.Add(e);
+            }
+            // Set the selected index to something other
+            // than -1, the default, so that your list
+            // has a pre-selection.
+
+            SelectedIndex = 0;
+            return SelectionState.Done;
+        }
+
+        public override IEnumerable<AssociativeNode> BuildOutputAst(List<AssociativeNode> inputAstNodes)
+        {
+            // Build an AST node for the type of object contained in your Items collection.
+
+            var intNode = AstFactory.BuildIntNode((int)Items[SelectedIndex].Item);
+            var assign = AstFactory.BuildAssignment(GetAstIdentifierForOutputIndex(0), intNode);
+
+            return new List<AssociativeNode> { assign };
+        }
+    }
+}

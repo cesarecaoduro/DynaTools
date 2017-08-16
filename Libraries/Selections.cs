@@ -40,7 +40,7 @@ namespace SelectionTools
     public static class Selections
     {
 
-        [MultiReturn(new[] { "message", "elements" })]
+        [MultiReturn(new[] {"elements" })]
         public static Dictionary<string, object> ActiveSelection(Boolean refresh = false)
         {
             string message = "Select somehthing";
@@ -80,12 +80,12 @@ namespace SelectionTools
             }
             return new Dictionary<string, object>
                 {
-                    { "message", message},
                     { "elements", elements},
+                    { "message", message},
                 };
         }
 
-        [MultiReturn(new[] { "message", "elements" })]
+        [MultiReturn(new[] {"elements" })]
         public static Dictionary<string, object> ActiveSelectionOfCategory(Boolean refresh = false, Revit.Elements.Category category = null)
         {
             string message = "Select something";
@@ -134,13 +134,13 @@ namespace SelectionTools
                 }
             }
             return new Dictionary<string, object>
-                {
-                    { "message", message},
+                { 
                     { "elements", elements},
+                    { "message", message},
                 };
         }
 
-        [MultiReturn(new[] { "message", "elements" })]
+        [MultiReturn(new[] {"elements" })]
         public static Dictionary<string, object> SelectFromViewport(Boolean refresh = false)
         {
             string message = "Select something";
@@ -180,12 +180,12 @@ namespace SelectionTools
             }
             return new Dictionary<string, object>
                 {
-                    { "message", message},
                     { "elements", elements},
+                    { "message", message},
                 };
         }
 
-        [MultiReturn(new[] { "message", "elements" })]
+        [MultiReturn(new[] {"elements" })]
         public static Dictionary<string, object> SelectFromViewportOfCategory(Boolean refresh = false, Revit.Elements.Category category = null)
         {
             string message = "Select something";
@@ -225,13 +225,13 @@ namespace SelectionTools
                 }
             }
             return new Dictionary<string, object>
-                {
-                    { "message", message},
+                {                   
                     { "elements", elements},
+                    { "message", message},
                 };
         }
 
-        [MultiReturn(new[] { "message", "elements" })]
+        [MultiReturn(new[] {"elements" })]
         public static Dictionary<string, object> SelectFromViewportRetainOrder(Boolean refresh = false)
         {
             string message = "Select something";
@@ -285,12 +285,12 @@ namespace SelectionTools
             }
             return new Dictionary<string, object>
                 {
-                    { "message", message},
                     { "elements", elements},
+                    { "message", message},
                 };
         }
 
-        [MultiReturn(new[] { "message", "elements" })]
+        [MultiReturn(new[] {"elements" })]
         public static Dictionary<string, object> SelectFromViewportOfCategoryRetainOrder(Boolean refresh = false, Revit.Elements.Category category = null)
         {
             string message = "Select something";
@@ -345,8 +345,8 @@ namespace SelectionTools
             }
             return new Dictionary<string, object>
                 {
-                    { "message", message},
                     { "elements", elements},
+                    { "message", message},
                 };
         }
 

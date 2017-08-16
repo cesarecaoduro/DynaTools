@@ -9,6 +9,8 @@ using Revit.Elements;
 using DynaToolsFunctions;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.Creation;
+
 
 using DSRevitNodesUI;
 
@@ -28,7 +30,7 @@ namespace ElementTools
         [MultiReturn(new[] { "parameterInstanceNames", "parameterTypeNames", "parameterInstanceList", "parameterTypeList" })]
         public static Dictionary<string, object> getAllElementsParameters(List<Revit.Elements.Element> elements)
         {
-            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
             List<object> listType = new List<object>();
             List<object> listInstance = new List<object>();
             Autodesk.Revit.DB.Element el = doc.GetElement(elements[0].UniqueId.ToString());
@@ -112,7 +114,7 @@ namespace ElementTools
         [IsVisibleInDynamoLibrary(false)]
         public static string copyIDToParameter(List<Revit.Elements.Element> elements, string parameterName = "")
         {
-            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
             string executed = "";
 
             if (parameterName != "")
@@ -148,7 +150,7 @@ namespace ElementTools
         /// <param name="refresh"></param>
         /// <returns></returns>
         [MultiReturn(new[] { "Elements" })]
-        public static Dictionary<string, object> ElementByCategoryFromDocument(Document doc, Revit.Elements.Category category, Boolean refresh = false)
+        public static Dictionary<string, object> ElementByCategoryFromDocument(Autodesk.Revit.DB.Document doc, Revit.Elements.Category category, Boolean refresh = false)
         {
             List<Revit.Elements.Element> elList = new List<Revit.Elements.Element>();
             if (refresh)
@@ -189,7 +191,7 @@ namespace ElementTools
         /// <param name="refresh"></param>
         /// <returns></returns>
         [MultiReturn(new[] { "Elements", "Values", "Result" })]
-        public static Dictionary<string, object> ElementParametersByCategoryFromDocument(Document doc, Revit.Elements.Category category, List<string> parameters = null, Boolean refresh = false)
+        public static Dictionary<string, object> ElementParametersByCategoryFromDocument(Autodesk.Revit.DB.Document doc, Revit.Elements.Category category, List<string> parameters = null, Boolean refresh = false)
         {
             string executed = "";
             List<Revit.Elements.Element> elList = new List<Revit.Elements.Element>();
@@ -269,7 +271,7 @@ namespace ElementTools
         [MultiReturn(new[] { "found", "notFound"})]
         public static Dictionary<string, object> CheckIfParameterExist(List<String> parameters)
         {
-            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
             FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(ParameterElement));
             List<string> found = new List<string>();
             List<string> notFound = new List<string>();
@@ -317,7 +319,7 @@ namespace ElementTools
         [MultiReturn(new[] { "elements" })]
         public static Dictionary<string, object> ChangeFittingsLevel(List<Revit.Elements.Element> elements, Revit.Elements.Level endLevel)
         {
-            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
             string result = "";
             Autodesk.Revit.DB.Element ll = doc.GetElement(endLevel.UniqueId.ToString());
             double ofEndLevel = ll.get_Parameter(BuiltInParameter.LEVEL_ELEV).AsDouble();
@@ -361,7 +363,7 @@ namespace ElementTools
         public static Dictionary<string, object> CreateDuctInsulation(List<Revit.Elements.Element> elements, Revit.Elements.Element ductInsulationType, double insulationThickness)
         {
             string result = "";
-            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
             ElementId dITId = doc.GetElement(ductInsulationType.UniqueId.ToString()).Id;
             insulationThickness *= 0.00328084;
 
@@ -400,7 +402,7 @@ namespace ElementTools
         public static Dictionary<string, object> CreatePipeInsulation(List<Revit.Elements.Element> elements, Revit.Elements.Element pipeInsulationType, double insulationThickness)
         {
             string result = "";
-            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
             ElementId dITId = doc.GetElement(pipeInsulationType.UniqueId.ToString()).Id;
             insulationThickness *= 0.00328084;
 
@@ -436,7 +438,7 @@ namespace ElementTools
         public static Dictionary<string, object> SplitPipeByPoints(Revit.Elements.Element element, List<Autodesk.DesignScript.Geometry.Point> points)
         {
             string result = "";
-            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
             List<Revit.Elements.Element> splitPipes = new List<Revit.Elements.Element>();
             ElementId eId = doc.GetElement(element.UniqueId.ToString()).Id;
             Units units = doc.GetUnits();
@@ -470,7 +472,7 @@ namespace ElementTools
         public static Dictionary<string, object> SplitDuctByPoints(Revit.Elements.Element element, List<Autodesk.DesignScript.Geometry.Point> points)
         {
             string result = "";
-            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
             List<Revit.Elements.Element> splitDucts = new List<Revit.Elements.Element>();
             ElementId eId = doc.GetElement(element.UniqueId.ToString()).Id;
             Units units = doc.GetUnits();
@@ -499,6 +501,110 @@ namespace ElementTools
                 { "result", result}
             };
         }
+
+        [MultiReturn(new[] { "ENZ" })]
+        public static Dictionary<string, object> getTrueCoordinates(Revit.Elements.Element elements)
+        {
+            string message = "";
+
+
+            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
+
+            Units units = doc.GetUnits();
+            FormatOptions fo = units.GetFormatOptions(UnitType.UT_Length);
+            List<double> output = new List<double>();
+
+            //Document openedDoc = null;
+            //UIApplication uiapp = DocumentManager.Instance.CurrentUIApplication;
+            //Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
+            //UIDocument uidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument;
+            ProjectLocation pr = doc.ActiveProjectLocation;
+            Transform tr = pr.GetTotalTransform().Inverse;
+
+            try
+            {
+                Autodesk.Revit.DB.Element e = doc.GetElement(elements.UniqueId.ToString());
+                Autodesk.Revit.DB.FamilyInstance fi = e as Autodesk.Revit.DB.FamilyInstance;
+
+                LocationPoint loc = fi.Location as LocationPoint;
+
+                XYZ p = tr.OfPoint(loc.Point);
+
+                double x = UnitUtils.ConvertFromInternalUnits(p.X, fo.DisplayUnits);
+                double y = UnitUtils.ConvertFromInternalUnits(p.Y, fo.DisplayUnits);
+                double z = UnitUtils.ConvertFromInternalUnits(p.Z, fo.DisplayUnits);
+
+                output.AddRange(new List<Double> {x, y, z});
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
+            return new Dictionary<string, object>
+            {
+                {"ENZ", output},
+            };
+
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class Annotations
+    {
+        private static object spotCoordinate;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="elements"></param>
+        /// <param name="endLevel"></param>
+        /// <returns></returns>
+        [MultiReturn(new[] { "elements" })]
+        public static Dictionary<string, object> SpotCoordinatesByView(Revit.Elements.Element element, Revit.Elements.Views.View view, bool hasLeader = true, double hOffset = -10, double vOffset = 0)
+        {
+            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
+            string result = "";
+
+            try
+            {
+                Autodesk.Revit.DB.Element e = doc.GetElement(element.UniqueId);
+                Autodesk.Revit.DB.View v = doc.GetElement(view.UniqueId) as View;
+
+                Autodesk.Revit.DB.FamilyInstance fi = e as Autodesk.Revit.DB.FamilyInstance;
+                Options opt = new Options();
+                opt.ComputeReferences = true;
+                opt.IncludeNonVisibleObjects = true;
+
+                IList<Reference> rr = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack);
+                foreach (Reference r in rr)
+                {
+                }
+                LocationPoint loc = e.Location as LocationPoint;
+
+                //XYZ origin = new XYZ(0, 0, 0);
+                XYZ rf = loc.Point;
+                XYZ bend = new XYZ(0, 10, 0);
+                XYZ end = new XYZ(0, 10, 0);
+
+                SpotDimension sp = doc.Create.NewSpotCoordinate(v, rr[0], rf, bend, end, rf, hasLeader);
+                spotCoordinate = sp.ToDSType(true);
+
+                result = "Executed";
+            }
+            catch (Exception ex)
+            {
+                result = "Not executed: " + ex.Message;
+            }
+
+            return new Dictionary<string, object>
+            {
+                {"elements", spotCoordinate},
+                { "result", result}
+            };
+        }
+
     }
 
 }

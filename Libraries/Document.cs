@@ -5,6 +5,11 @@ using RevitServices.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autodesk.DesignScript.Runtime;
+using Dynamo.Graph.Nodes;
+using RevitServices.Persistence;
+using Revit.Elements;
+using DynaToolsFunctions;
 
 namespace DocumentTools
 {
@@ -231,6 +236,19 @@ namespace DocumentTools
             };
 
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="audit"></param>
+        /// <param name="detachFromCentralOption">
+        /// 0 = ClearTransmittedSaveAsNewCentral,
+        /// 1 = DetachAndDiscardWorksets,
+        /// 2 = DetachAndPreserveWorksets,
+        /// 3 = DoNotDetach
+        /// </param>
+        /// <returns></returns>
+        
 
     }
 

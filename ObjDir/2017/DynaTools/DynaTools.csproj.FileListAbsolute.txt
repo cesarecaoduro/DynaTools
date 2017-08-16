@@ -4,3 +4,4 @@ C:\Users\CECA\OneDrive\GitHub\DynaTools\bin\Debug\DynaTools.dll
 C:\Users\CECA\OneDrive\GitHub\DynaTools\bin\Debug\DynaTools.pdb
 C:\Users\CECA\OneDrive\GitHub\DynaTools\ObjDir\2017\DynaTools\DynaTools.dll
 C:\Users\CECA\OneDrive\GitHub\DynaTools\ObjDir\2017\DynaTools\DynaTools.pdb
+C:\Users\CECA\OneDrive\GitHub\DynaTools\ObjDir\2017\DynaTools\DynaTools.csprojResolveAssemblyReference.cache
