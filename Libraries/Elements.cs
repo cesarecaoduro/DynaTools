@@ -562,7 +562,7 @@ namespace ElementTools
         /// <param name="endLevel"></param>
         /// <returns></returns>
         [MultiReturn(new[] { "elements" })]
-        public static Dictionary<string, object> SpotCoordinatesByView(Revit.Elements.Element element, Revit.Elements.Views.View view, bool hasLeader = true, double hOffset = -10, double vOffset = 0)
+        public static Dictionary<string, object> SpotCoordinatesByView(Revit.Elements.Element element, Revit.Elements.Views.View view, bool hasLeader = true)
         {
             Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
             string result = "";
@@ -585,8 +585,8 @@ namespace ElementTools
 
                 //XYZ origin = new XYZ(0, 0, 0);
                 XYZ rf = loc.Point;
-                XYZ bend = new XYZ(0, 10, 0);
-                XYZ end = new XYZ(0, 10, 0);
+                XYZ bend = new XYZ(rf.X -5 , rf.Y, 0);
+                XYZ end = new XYZ(rf.X , rf.Y - 15, 0);
 
                 SpotDimension sp = doc.Create.NewSpotCoordinate(v, rr[0], rf, bend, end, rf, hasLeader);
                 spotCoordinate = sp.ToDSType(true);
