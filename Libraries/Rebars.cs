@@ -6,6 +6,7 @@ using Revit.Elements;
 using RevitServices.Persistence;
 using System;
 using System.Collections.Generic;
+using Autodesk.Revit.DB.Structure;
 
 namespace RebarTools
 {

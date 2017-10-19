@@ -40,13 +40,22 @@ namespace ElementTools
             List<string> paramInstanceNames = new List<string>();
             List<string> paramTypeNames = new List<string>();
 
+            foreach (Autodesk.Revit.DB.Parameter p in paramSet)
+            {
+                paramInstanceNames.Add(p.Definition.Name);
+            }
+
+            foreach (Autodesk.Revit.DB.Parameter p in paramSet)
+            {
+                paramTypeNames.Add(p.Definition.Name);
+            }
+
             foreach (Revit.Elements.Element e in elements)
             {
                 List<object> itemInstanceParams = new List<object>();
                 el = doc.GetElement(e.UniqueId.ToString());
                 foreach (Autodesk.Revit.DB.Parameter p in paramSet)
                 {
-                    paramInstanceNames.Add(p.Definition.Name);
                     if (el.get_Parameter(p.Definition) != null)
                     {
                         switch (el.get_Parameter(p.Definition).StorageType)
@@ -74,7 +83,7 @@ namespace ElementTools
                 Autodesk.Revit.DB.Element eType = doc.GetElement(el.GetTypeId());
                 foreach (Autodesk.Revit.DB.Parameter p in paramSetType)
                 {
-                    paramTypeNames.Add(p.Definition.Name);
+                    
                     if (eType.get_Parameter(p.Definition) != null)
                         {
                             switch (eType.get_Parameter(p.Definition).StorageType)
@@ -561,49 +570,49 @@ namespace ElementTools
         /// <param name="elements"></param>
         /// <param name="endLevel"></param>
         /// <returns></returns>
-        [MultiReturn(new[] { "elements" })]
-        public static Dictionary<string, object> SpotCoordinatesByView(Revit.Elements.Element element, Revit.Elements.Views.View view, bool hasLeader = true)
-        {
-            Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
-            string result = "";
+        //[MultiReturn(new[] { "elements" })]
+        //public static Dictionary<string, object> SpotCoordinatesByView(Revit.Elements.Element element, Revit.Elements.Views.View view, bool hasLeader = true)
+        //{
+        //    Autodesk.Revit.DB.Document doc = DocumentManager.Instance.CurrentDBDocument;
+        //    string result = "";
 
-            try
-            {
-                Autodesk.Revit.DB.Element e = doc.GetElement(element.UniqueId);
-                Autodesk.Revit.DB.View v = doc.GetElement(view.UniqueId) as View;
+        //    try
+        //    {
+        //        Autodesk.Revit.DB.Element e = doc.GetElement(element.UniqueId);
+        //        Autodesk.Revit.DB.View v = doc.GetElement(view.UniqueId) as View;
 
-                Autodesk.Revit.DB.FamilyInstance fi = e as Autodesk.Revit.DB.FamilyInstance;
-                Options opt = new Options();
-                opt.ComputeReferences = true;
-                opt.IncludeNonVisibleObjects = true;
+        //        Autodesk.Revit.DB.FamilyInstance fi = e as Autodesk.Revit.DB.FamilyInstance;
+        //        Options opt = new Options();
+        //        opt.ComputeReferences = true;
+        //        opt.IncludeNonVisibleObjects = true;
 
-                IList<Reference> rr = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack);
-                foreach (Reference r in rr)
-                {
-                }
-                LocationPoint loc = e.Location as LocationPoint;
+        //        IList<Reference> rr = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack);
+        //        foreach (Reference r in rr)
+        //        {
+        //        }
+        //        LocationPoint loc = e.Location as LocationPoint;
 
-                //XYZ origin = new XYZ(0, 0, 0);
-                XYZ rf = loc.Point;
-                XYZ bend = new XYZ(rf.X -5 , rf.Y, 0);
-                XYZ end = new XYZ(rf.X , rf.Y - 15, 0);
+        //        //XYZ origin = new XYZ(0, 0, 0);
+        //        XYZ rf = loc.Point;
+        //        XYZ bend = new XYZ(rf.X -5 , rf.Y, 0);
+        //        XYZ end = new XYZ(rf.X , rf.Y - 15, 0);
 
-                SpotDimension sp = doc.Create.NewSpotCoordinate(v, rr[0], rf, bend, end, rf, hasLeader);
-                spotCoordinate = sp.ToDSType(true);
+        //        SpotDimension sp = doc.Create.NewSpotCoordinate(v, rr[0], rf, bend, end, rf, hasLeader);
+        //        spotCoordinate = sp.ToDSType(true);
 
-                result = "Executed";
-            }
-            catch (Exception ex)
-            {
-                result = "Not executed: " + ex.Message;
-            }
+        //        result = "Executed";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        result = "Not executed: " + ex.Message;
+        //    }
 
-            return new Dictionary<string, object>
-            {
-                {"elements", spotCoordinate},
-                { "result", result}
-            };
-        }
+        //    return new Dictionary<string, object>
+        //    {
+        //        {"elements", spotCoordinate},
+        //        { "result", result}
+        //    };
+        //}
 
     }
 
